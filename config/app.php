@@ -70,7 +70,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
 
     /*
     |--------------------------------------------------------------------------
@@ -185,4 +185,20 @@ return [
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Account
+    |--------------------------------------------------------------------------
+    |
+    | This array contains all the admin account configuration used to seed
+    | the database in the first app install. This app is intented to have
+    | a single user, therefore, no registration views are needed.
+    |
+    */
+
+    'admin_account' => [
+        'name' => env('ADMIN_ACCOUNT_NAME'),
+        'email' => env('ADMIN_ACCOUNT_EMAIL'),
+        'password' => env('ADMIN_ACCOUNT_PASSWORD')
+    ]
 ];

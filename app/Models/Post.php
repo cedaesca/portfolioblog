@@ -34,5 +34,10 @@ class Post extends Model
         return Attribute::make(
             set: fn (string $value) => strtolower($value)
         );
-    } 
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
 }

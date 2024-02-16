@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Interfaces\Services\PostServiceInterface;
 use App\Services\PostService;
+use Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\Sanctum;
 
@@ -14,7 +15,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $isProduction = $this->app->environment('production');
+
         Sanctum::ignoreMigrations();
+
+        if (!$isProduction) {
+            $this->app->register(IdeHelperServiceProvider::class);
+        }
     }
 
     /**

@@ -20,7 +20,7 @@ class Post extends Model
         'slug',
         'title',
         'content',
-        'is_article',
+        'type',
         'is_published'
     ];
 

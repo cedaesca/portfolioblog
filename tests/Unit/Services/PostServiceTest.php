@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Services;
 
 use App\Enums\PostType;
 use App\Interfaces\Services\PostServiceInterface;

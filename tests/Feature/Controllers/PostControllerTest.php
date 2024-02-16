@@ -5,11 +5,12 @@ namespace Tests\Feature\Controllers;
 use App\Enums\PostType;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class PostControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function a_guest_can_access_index()
     {

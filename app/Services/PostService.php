@@ -20,4 +20,11 @@ class PostService implements PostServiceInterface
     {
         return $this->postModel->article()->get();
     }
+
+    public function getPostBySlug(string $slug): ?Post
+    {
+        return $this->postModel
+            ->whereSlug(strtolower($slug))
+            ->first();
+    }
 }

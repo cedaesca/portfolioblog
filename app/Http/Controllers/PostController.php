@@ -15,10 +15,13 @@ class PostController extends Controller
      */
     public function index(): View
     {
+        $articles = $this->postService->getAllPublishedArticles();
+        $projects = $this->postService->getAllPublishedProjects();
+        
         return view('posts.index')
             ->with([
-                'projects' => $this->postService->getAllProjects(),
-                'articles' => $this->postService->getAllArticles()
+                'articles' => $articles,
+                'projects' => $projects
             ]);
     }
 
@@ -41,9 +44,13 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $slug): View
     {
-        //
+        $post = $this->postService->getPublishedPostBySlug($slug);
+
+        abort_if(!$post, 404);
+
+        return view('posts.show')->with('post', $post);
     }
 
     /**

@@ -51,6 +51,18 @@ class PostTest extends TestCase
         $this->assertEmpty($mismatchMessages, implode("\n", $mismatchMessages));
     }
 
+    /** @test */
+    public function published_scope_returns_published_posts_only(): void
+    {
+        Post::factory()->count(17)->create(['is_published' => true]);
+        Post::factory()->count(34)->create(['is_published' => false]);
+        Post::factory()->count(3)->create(['is_published' => true]);
+
+        $posts = Post::published()->get();
+
+        $this->assertCount(20, $posts);
+    }
+
     private function seedPosts()
     {
         Post::factory()->count(22)->create(['type' => PostType::Article]);

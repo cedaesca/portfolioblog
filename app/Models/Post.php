@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder|Post whereTitle($value)
  * @method static Builder|Post whereType($value)
  * @method static Builder|Post whereUpdatedAt($value)
+ * @method static Builder|Post published()
  * @mixin \Eloquent
  */
 class Post extends Model
@@ -75,5 +76,10 @@ class Post extends Model
     public function scopeProject(Builder $query)
     {
         $query->where('type', PostType::Project);
+    }
+
+    public function scopePublished(Builder $query)
+    {
+        $query->where('is_published', true);
     }
 }

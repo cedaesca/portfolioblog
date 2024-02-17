@@ -13,11 +13,11 @@ class PostService implements PostServiceInterface
 
     public function getAllProjects(): Collection
     {
-        return $this->postModel->where('type', PostType::Project->value)->get();
+        return $this->postModel->project()->get();
     }
 
     public function getAllArticles(): Collection
     {
-        return $this->postModel->where('type', PostType::Article->value)->get();
+        return $this->postModel->article()->get();
     }
 }

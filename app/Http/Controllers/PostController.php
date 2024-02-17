@@ -41,9 +41,14 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $slug): View
     {
-        //
+        $post = $this->postService->getPostBySlug($slug);
+
+        abort_if(!$post, 404);
+
+        return view('posts.show')
+            ->with('post', $this->postService->getPostBySlug($slug));
     }
 
     /**

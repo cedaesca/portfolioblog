@@ -14,7 +14,7 @@
     </header>
     
     <section>
-        {!! $post->content !!}
+        {{ $post->content }}
     </section>
 
     <footer>

@@ -20,7 +20,7 @@ class PostFactory extends Factory
         return [
             'slug' => fake()->unique()->slug(),
             'title' => fake()->sentence(),
-            'content' => fake()->randomHtml,
+            'content' => fake()->text(mt_rand(2000, 10000)),
             'type' => (mt_rand(0, 1) == 0) ? PostType::Article : PostType::Project,
             'is_published' => fake()->boolean()
         ];

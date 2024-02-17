@@ -11,19 +11,26 @@ class PostService implements PostServiceInterface
 {
     public function __construct(private Post $postModel) {}
 
-    public function getAllProjects(): Collection
-    {
-        return $this->postModel->project()->get();
-    }
-
-    public function getAllArticles(): Collection
-    {
-        return $this->postModel->article()->get();
-    }
-
-    public function getPostBySlug(string $slug): ?Post
+    public function getAllPublishedProjects(): Collection
     {
         return $this->postModel
+            ->published()
+            ->project()
+            ->get();
+    }
+
+    public function getAllPublishedArticles(): Collection
+    {
+        return $this->postModel
+            ->published()
+            ->article()
+            ->get();
+    }
+
+    public function getPublishedPostBySlug(string $slug): ?Post
+    {
+        return $this->postModel
+            ->published()
             ->whereSlug(strtolower($slug))
             ->first();
     }

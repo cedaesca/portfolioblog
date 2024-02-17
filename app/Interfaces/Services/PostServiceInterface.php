@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Collection;
 interface PostServiceInterface
 {
     /** @return Collection|Post */
-    public function getAllProjects(): Collection;
+    public function getAllPublishedProjects(): Collection;
 
     /** @return Collection|Post */
-    public function getAllArticles(): Collection;
+    public function getAllPublishedArticles(): Collection;
 
-    public function getPostBySlug(string $slug): ?Post;
+    public function getPublishedPostBySlug(string $slug): ?Post;
 }
 

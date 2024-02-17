@@ -26,14 +26,17 @@ class PostControllerTest extends TestCase
     }
 
     /** @test */
-    public function index_can_access_articles_and_projects(): void
+    public function index_can_access_published_articles_and_projects(): void
     {
-        $projects = Post::factory()->count(10)->create(['type' => PostType::Project]);
-        $articles = Post::factory()->count(15)->create(['type' => PostType::Article]);
+        Post::factory()->count(10)->create(['type' => PostType::Project, 'is_published' => false]);
+        Post::factory()->count(15)->create(['type' => PostType::Article, 'is_published' => false]);
+
+        $publishedProjects = Post::factory()->count(22)->create(['type' => PostType::Project, 'is_published' => true]);
+        $publishedArticles = Post::factory()->count(37)->create(['type' => PostType::Article, 'is_published' => true]);
 
         $response = $this->get('/');
 
-        $response->assertViewHas('projects', $projects);
-        $response->assertViewHas('articles', $articles);
+        $response->assertViewHas('projects', $publishedProjects);
+        $response->assertViewHas('articles', $publishedArticles);
     }
 }

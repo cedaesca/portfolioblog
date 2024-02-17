@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Enums\PostType;
 use App\Interfaces\Services\PostServiceInterface;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Collection;

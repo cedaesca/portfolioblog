@@ -97,6 +97,31 @@ class PostControllerTest extends TestCase
         $response->assertNotFound();
     }
 
+    /**
+     * Create tests
+     */
+    public function a_guest_can_access_create_form()
+    {
+        $response = $this->get(route('posts.create'));
+        $response->assertStatus(200);
+    }
+
+    /** @test */
+    public function create_renders_correct_view(): void
+    {
+        $response = $this->get(route('posts.create'));
+        $response->assertViewIs('posts.create');
+    }
+
+    /** @test */
+    public function create_view_can_access_post_types(): void
+    {
+        $response = $this->get(route('posts.create'));
+
+        $response->assertViewHas('postTypes', PostType::cases());
+    }
+
+
     private function createSinglePublishedPost(): Post
     {
         return Post::factory()->create(['is_published' => true, 'slug' => 'test']);

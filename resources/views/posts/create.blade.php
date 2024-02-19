@@ -12,6 +12,16 @@
             @csrf
             
             <div>
+                <label for="slug">Slug:</label>
+                <br>
+                <input type="text" id="slug" name="slug" value="{{ old('slug') }}" required>
+                @if ($errors->has('slug'))
+                    <div style="color: red;">{{ $errors->first('slug') }}</div>
+                @endif
+            </div>
+            <br>
+
+            <div>
                 <label for="title">Title:</label>
                 <br>
                 <input type="text" id="title" name="title" value="{{ old('title') }}" required>
@@ -56,5 +66,34 @@
             <button type="submit">Create Post</button>
         </form>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const titleInput = document.getElementById('title');
+            const slugInput = document.getElementById('slug');
+            let suggestedSlug = '';
+
+            const generateSlug = (title) => title
+                .toLowerCase()
+                .replace(/[\s\W-]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+
+            titleInput.addEventListener('input', () => {
+                suggestedSlug = generateSlug(titleInput.value);
+                slugInput.value = suggestedSlug;
+            });
+
+            document.querySelector('form').addEventListener('submit', (e) => {
+                if (slugInput.value !== suggestedSlug) {
+                    const confirmSlugChange = confirm('The slug has been manually modified. Do you want to keep the changes and continue?');
+
+                    if (!confirmSlugChange) {
+                        e.preventDefault();
+                        slugInput.value = suggestedSlug;
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>

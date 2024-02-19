@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PostType;
+use App\Http\Requests\StorePostRequest;
 use App\Interfaces\Services\PostServiceInterface;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -37,9 +39,10 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePostRequest $request): RedirectResponse
     {
-        //
+        $validated = $request->validated();
+        return redirect(route('index'));
     }
 
     /**

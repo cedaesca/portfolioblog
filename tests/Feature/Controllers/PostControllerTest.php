@@ -18,14 +18,14 @@ class PostControllerTest extends TestCase
     /** @test */
     public function a_guest_can_access_index()
     {
-        $response = $this->get('/');
+        $response = $this->get(route('index'));
         $response->assertStatus(200);
     }
 
     /** @test */
     public function index_renders_correct_view(): void
     {
-        $response = $this->get('/');
+        $response = $this->get(route('index'));
         $response->assertViewIs('posts.index');
     }
 
@@ -38,7 +38,7 @@ class PostControllerTest extends TestCase
         $publishedProjects = Post::factory()->count(22)->create(['type' => PostType::Project, 'is_published' => true]);
         $publishedArticles = Post::factory()->count(37)->create(['type' => PostType::Article, 'is_published' => true]);
 
-        $response = $this->get('/');
+        $response = $this->get(route('index'));
 
         $response->assertViewHas('projects', $publishedProjects);
         $response->assertViewHas('articles', $publishedArticles);

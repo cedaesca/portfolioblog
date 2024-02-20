@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class PostService implements PostServiceInterface
 {
-    public function __construct(private Post $postModel) {}
+    public function __construct(private readonly Post $postModel) {}
 
     public function getAllPublishedProjects(): Collection
     {
@@ -32,5 +32,14 @@ class PostService implements PostServiceInterface
             ->published()
             ->whereSlug(strtolower($slug))
             ->first();
+    }
+
+    public function storePost(array $attributes): Post
+    {
+        $post = $this->postModel->newInstance($attributes);
+
+        $post->save();
+
+        return $post;
     }
 }

@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PostType;
+use App\Http\Requests\StorePostRequest;
 use App\Interfaces\Services\PostServiceInterface;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Log\Logger;
 
 class PostController extends Controller
 {
-    public function __construct(private PostServiceInterface $postService) {}
+    public function __construct(private PostServiceInterface $postService, private readonly Logger $logger) {}
 
     /**
      * Display a listing of the resource.
@@ -28,17 +32,30 @@ class PostController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): View
     {
-        //
+        return view('posts.create')->with(['postTypes' => PostType::cases()]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePostRequest $request): RedirectResponse
     {
-        //
+        $validated = $request->validated();
+        $postRoute = '';
+        
+        try{
+            $post = $this->postService->storePost($validated);
+
+            $postRoute = route('posts.show', $post->slug);
+        } catch (\Exception $e) {
+            $this->logger->error('Error during post creation: ' . $e->getMessage());
+
+            return back()->withErrors('An error occured while creating the post. Please try again.');
+        }
+
+        return redirect()->to($postRoute);
     }
 
     /**

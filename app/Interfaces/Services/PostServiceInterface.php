@@ -14,5 +14,7 @@ interface PostServiceInterface
     public function getAllPublishedArticles(): Collection;
 
     public function getPublishedPostBySlug(string $slug): ?Post;
+
+    public function storePost(array $attributes): Post;
 }
 

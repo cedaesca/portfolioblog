@@ -5,12 +5,14 @@ namespace Tests\Feature\Services;
 use App\Enums\PostType;
 use App\Interfaces\Services\PostServiceInterface;
 use App\Models\Post;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class PostServiceTest extends TestCase
 {
     private PostServiceInterface $postService;
+    private readonly string $postTable;
 
     use RefreshDatabase;
     
@@ -20,6 +22,7 @@ class PostServiceTest extends TestCase
         parent::setUp();
 
         $this->postService = $this->app->make(PostServiceInterface::class);
+        $this->postTable = (new Post())->getTable();
     }
     
     /** @test */
@@ -60,6 +63,24 @@ class PostServiceTest extends TestCase
         }
 
         $this->assertEmpty($mismatchMessages, implode("\n", $mismatchMessages));
+    }
+
+    /** @test */
+    public function store_post_saves_to_database()
+    {
+        $postAttributes = Post::factory()->make()->toArray();
+
+        $this->postService->storePost($postAttributes);
+
+        $this->assertDatabaseHas($this->postTable, $postAttributes);
+    }
+
+    /** @test */
+    public function store_post_throws_exception_with_invalid_data()
+    {
+        $this->expectException(QueryException::class);
+
+        $this->postService->storePost([]);
     }
 
     private function seedPosts()

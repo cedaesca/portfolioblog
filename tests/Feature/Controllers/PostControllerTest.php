@@ -3,13 +3,34 @@
 namespace Tests\Feature\Controllers;
 
 use App\Enums\PostType;
+use App\Interfaces\Services\PostServiceInterface;
 use App\Models\Post;
+use App\Services\PostService;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Log\Logger;
+use Mockery;
 use Tests\TestCase;
 
 class PostControllerTest extends TestCase
 {
+    /** @var \Mockery\MockInterface|Logger */
+    private $loggerMock;
+
+    private readonly string $postTable;
+
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->loggerMock = Mockery::mock(Logger::class);
+
+        $this->app->instance(Logger::class, $this->loggerMock);
+
+        $this->postTable = (new Post())->getTable();
+    }
 
     /**
      * Index tests
@@ -100,6 +121,8 @@ class PostControllerTest extends TestCase
     /**
      * Create tests
      */
+
+     /** @test */
     public function a_guest_can_access_create_form()
     {
         $response = $this->get(route('posts.create'));
@@ -121,6 +144,85 @@ class PostControllerTest extends TestCase
         $response->assertViewHas('postTypes', PostType::cases());
     }
 
+    /**
+     * Store tests
+     */
+
+    /** @test */
+    public function a_guest_can_store_a_post()
+    {
+        $postAttributes = Post::factory()->make()->toArray();
+
+        $this->post(route('posts.store'), $postAttributes);
+
+        $this->assertDatabaseHas($this->postTable, $postAttributes);
+    }
+
+    /** @test */
+    public function creator_is_redirected_to_successfully_created_post()
+    {
+        $postAttributes = Post::factory()->make()->toArray();
+
+        $response = $this->post(route('posts.store'), $postAttributes);
+
+        $response->assertRedirectToRoute('posts.show', $postAttributes['slug']);
+    }
+
+    /** @test */
+    public function creator_is_redirected_to_create_form_when_there_are_validation_errors()
+    {
+        $createRoute = route('posts.create');
+
+        $response = $this->from($createRoute)->post(route('posts.store'), []);
+
+        $response->assertRedirect($createRoute);
+        $response->assertSessionHasErrors();
+    }
+
+    /** @test */
+    public function an_error_is_logged_when_exception_is_thrown_during_post_creation()
+    {
+        $postAttributes = Post::factory()->make()->toArray();
+
+        /** @var \Mockery\MockInterface|PostServiceInterface */
+        $serviceMock = Mockery::mock(PostService::class);
+
+        $exceptionMessage = 'Error during post creation';
+
+        $this->app->instance(PostServiceInterface::class, $serviceMock);
+
+        $serviceMock->shouldReceive('storePost')->andThrow(new Exception($exceptionMessage));
+
+        $this->loggerMock
+            ->shouldReceive('error')
+            ->with("Error during post creation: {$exceptionMessage}")
+            ->once();
+
+        $this->post(route('posts.store'), $postAttributes);
+    }
+
+    /** @test */
+    public function creator_is_redirected_to_create_form_when_exception_is_thrown()
+    {
+        $createRoute = route('posts.create');
+
+        $postAttributes = Post::factory()->make()->toArray();
+
+        /** @var \Mockery\MockInterface|PostServiceInterface */
+        $serviceMock = Mockery::mock(PostService::class);
+
+        $this->app->instance(PostServiceInterface::class, $serviceMock);
+
+        $serviceMock->shouldReceive('storePost')->andThrow(new Exception(''));
+
+        $this->loggerMock->shouldReceive('error');
+
+        $response = $this->from($createRoute)->post(route('posts.store'), $postAttributes);
+
+        $response->assertRedirect($createRoute);
+
+        $response->assertSessionHasErrors();
+    }
 
     private function createSinglePublishedPost(): Post
     {

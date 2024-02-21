@@ -1,30 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $post->title }}</title>
-</head>
-<body>
+@extends('layouts.app')
 
-<article>
-    <header>
-        <h1>{{ $post->title }}</h1>
-        <p>Published on: <time datetime="{{ $post->created_at->toDateString() }}">{{ $post->created_at->format('F d, Y') }}</time></p>
-    </header>
-    
-    <section>
-        {{ $post->content }}
-    </section>
+@section('title', $post->title . ' | ' . config('app.name'))
 
-    <footer>
-        <p>Post type: <strong>{{ $post->type->value }}</strong></p>
-    </footer>
-</article>
+@section('content')
+    <article>
+        <header>
+            <h1>{{ $post->title }}</h1>
+            <p>Published on: <time datetime="{{ $post->created_at->toDateString() }}">{{ $post->created_at->format('F d, Y') }}</time></p>
+        </header>
+        
+        <section>
+            {{ $post->content }}
+        </section>
 
-<nav>
-    <a href="{{ route('index') }}">Go Back</a>
-</nav>
+        <footer>
+            <p>Post type: <strong>{{ $post->type->value }}</strong></p>
+        </footer>
+    </article>
 
-</body>
-</html>
+    <nav>
+        <a href="{{ route('index') }}">Go Back</a>
+    </nav>
+@endsection

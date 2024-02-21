@@ -33,7 +33,7 @@ class PostControllerTest extends TestCase
 
         $this->postTable = (new Post())->getTable();
 
-        $this->user = User::factory()->make();
+        $this->user = User::factory()->create();
     }
 
     /**

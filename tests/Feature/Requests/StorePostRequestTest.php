@@ -17,7 +17,7 @@ class StorePostRequestTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->make();
+        $this->user = User::factory()->create();
     }
 
     /** @test */

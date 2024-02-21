@@ -1,66 +1,101 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# César Escudero's Portfolio
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This Laravel application is designed to serve as both a personal blog and portfolio. It showcases professional work and personal insights, all within a secure and user-friendly platform.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   **Secure Authentication**: Utilizes Laravel Fortify for robust, secure login mechanisms.
+-   **Personal Blog**: Easily manage and publish blog posts.
+-   **Portfolio Showcase**: Categorize and display portfolio projects.
+-   **Admin Account Seeding**: Automate the creation of the admin account for easy setup.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Installation
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+To get started with this project locally, follow these steps:
 
-## Learning Laravel
+### Clone the Repository
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+git clone https://github.com/cedaesca/portfolioblog.git
+cd portfolioblog
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+or using SSH
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+git clone git@github.com:cedaesca/portfolioblog.git
+cd portfolioblog
+```
 
-## Laravel Sponsors
+### Install Dependencies
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+composer install
+```
 
-### Premium Partners
+### Set Up Environment
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Duplicate `.env.example` to `.env` and configure your environment variables.
+
+```bash
+cp .env.example .env
+```
+
+### Generate App Key
+
+```bash
+php artisan key:generate
+```
+
+### Run Migrations and Seeders
+
+This will set up your database and create the admin account.
+
+```bash
+php artisan migrate --seed
+```
+
+### Serve the Application
+
+```bash
+php artisan serve
+```
+
+Access the application at `http://localhost:8000`.
+
+## Environment Configuration
+
+After cloning the repository and installing dependencies, you'll need to set up your `.env` file. Here's a quick guide based on the provided `.env.example`:
+
+-   **APP_NAME**: `"César Escudero's Portfolio"` - Set this to the name of your application.
+-   **ADMIN_ACCOUNT_NAME**, **ADMIN_ACCOUNT_EMAIL**, **ADMIN_ACCOUNT_PASSWORD**: Change these from the defaults to secure your admin account.
+-   **DB_CONNECTION**: Your database driver, e.g., `mysql`.
+-   **DB_DATABASE**, **DB_USERNAME**, **DB_PASSWORD**: Update with your database details.
+-   Configure **Mail**, **AWS**, **Redis**, and **Pusher** settings as required for your project.
+
+## Admin Login
+
+The admin login route is `/login`. The login link is intentionally omitted from the navigation.
+
+## Testing
+
+To run the tests included with this application, execute:
+
+```bash
+php artisan test
+```
+
+Ensure your `.env.testing` environment is correctly configured, especially the database connection.
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+This project is designed for personal use. However, feedback and suggestions are welcome. Please open an issue to discuss what you would like to change.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced under the MIT License. See the `LICENSE` file for more details.
+
+## Acknowledgements
+
+-   [Laravel](https://laravel.com/)
+-   [MIT LICENSE](LICENSE)

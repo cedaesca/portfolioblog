@@ -5,6 +5,7 @@ namespace Tests\Feature\Controllers;
 use App\Enums\PostType;
 use App\Interfaces\Services\PostServiceInterface;
 use App\Models\Post;
+use App\Models\User;
 use App\Services\PostService;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -18,6 +19,7 @@ class PostControllerTest extends TestCase
     private $loggerMock;
 
     private readonly string $postTable;
+    private readonly User $user;
 
     use RefreshDatabase;
 
@@ -30,6 +32,8 @@ class PostControllerTest extends TestCase
         $this->app->instance(Logger::class, $this->loggerMock);
 
         $this->postTable = (new Post())->getTable();
+
+        $this->user = User::factory()->make();
     }
 
     /**
@@ -122,24 +126,27 @@ class PostControllerTest extends TestCase
      * Create tests
      */
 
-     /** @test */
-    public function a_guest_can_access_create_form()
+    /** @test */
+    public function a_guest_cannot_access_create_form()
     {
         $response = $this->get(route('posts.create'));
-        $response->assertStatus(200);
+        $response->assertRedirect(route('login'));
     }
 
     /** @test */
     public function create_renders_correct_view(): void
     {
-        $response = $this->get(route('posts.create'));
+        $response = $this->actingAs($this->user)
+            ->get(route('posts.create'));
+
         $response->assertViewIs('posts.create');
     }
 
     /** @test */
     public function create_view_can_access_post_types(): void
     {
-        $response = $this->get(route('posts.create'));
+        $response = $this->actingAs($this->user)
+            ->get(route('posts.create'));
 
         $response->assertViewHas('postTypes', PostType::cases());
     }
@@ -149,31 +156,47 @@ class PostControllerTest extends TestCase
      */
 
     /** @test */
-    public function a_guest_can_store_a_post()
-    {
-        $postAttributes = Post::factory()->make()->toArray();
-
-        $this->post(route('posts.store'), $postAttributes);
-
-        $this->assertDatabaseHas($this->postTable, $postAttributes);
-    }
-
-    /** @test */
-    public function creator_is_redirected_to_successfully_created_post()
+    public function a_guest_cannot_store_a_post()
     {
         $postAttributes = Post::factory()->make()->toArray();
 
         $response = $this->post(route('posts.store'), $postAttributes);
 
+        $response->assertRedirect(route('login'));
+
+        $this->assertDatabaseMissing($this->postTable, $postAttributes);
+    }
+
+    /** @test */
+    public function an_user_can_create_a_post()
+    {
+        $postAttributes = Post::factory()->make()->toArray();
+
+        $this->actingAs($this->user)
+            ->post(route('posts.store'), $postAttributes);
+
+        $this->assertDatabaseHas($this->postTable, $postAttributes);
+    }
+
+    /** @test */
+    public function user_is_redirected_to_successfully_created_post()
+    {
+        $postAttributes = Post::factory()->make()->toArray();
+
+        $response = $this->actingAs($this->user)
+            ->post(route('posts.store'), $postAttributes);
+
         $response->assertRedirectToRoute('posts.show', $postAttributes['slug']);
     }
 
     /** @test */
-    public function creator_is_redirected_to_create_form_when_there_are_validation_errors()
+    public function user_is_redirected_to_create_form_when_there_are_validation_errors()
     {
         $createRoute = route('posts.create');
 
-        $response = $this->from($createRoute)->post(route('posts.store'), []);
+        $response = $this->actingAs($this->user)
+            ->from($createRoute)
+            ->post(route('posts.store'), []);
 
         $response->assertRedirect($createRoute);
         $response->assertSessionHasErrors();
@@ -198,11 +221,12 @@ class PostControllerTest extends TestCase
             ->with("Error during post creation: {$exceptionMessage}")
             ->once();
 
-        $this->post(route('posts.store'), $postAttributes);
+        $this->actingAs($this->user)
+            ->post(route('posts.store'), $postAttributes);
     }
 
     /** @test */
-    public function creator_is_redirected_to_create_form_when_exception_is_thrown()
+    public function user_is_redirected_to_create_form_when_exception_is_thrown()
     {
         $createRoute = route('posts.create');
 
@@ -217,7 +241,9 @@ class PostControllerTest extends TestCase
 
         $this->loggerMock->shouldReceive('error');
 
-        $response = $this->from($createRoute)->post(route('posts.store'), $postAttributes);
+        $response = $this->actingAs($this->user)
+            ->from($createRoute)
+            ->post(route('posts.store'), $postAttributes);
 
         $response->assertRedirect($createRoute);
 

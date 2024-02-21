@@ -12,7 +12,10 @@ use Illuminate\Log\Logger;
 
 class PostController extends Controller
 {
-    public function __construct(private PostServiceInterface $postService, private readonly Logger $logger) {}
+    public function __construct(private PostServiceInterface $postService, private readonly Logger $logger)
+    {
+        $this->middleware('auth')->except(['index', 'show']);
+    }
 
     /**
      * Display a listing of the resource.
@@ -21,7 +24,7 @@ class PostController extends Controller
     {
         $articles = $this->postService->getAllPublishedArticles();
         $projects = $this->postService->getAllPublishedProjects();
-        
+
         return view('posts.index')
             ->with([
                 'articles' => $articles,
@@ -44,8 +47,8 @@ class PostController extends Controller
     {
         $validated = $request->validated();
         $postRoute = '';
-        
-        try{
+
+        try {
             $post = $this->postService->storePost($validated);
 
             $postRoute = route('posts.show', $post->slug);

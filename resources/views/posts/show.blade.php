@@ -18,6 +18,12 @@
         </footer>
     </article>
 
+    @auth
+        <div>
+            <a href="{{ route('posts.edit', $post->slug) }}">Edit</a>
+        </div>
+    @endauth
+
     <nav>
         <a href="{{ route('index') }}">Go Back</a>
     </nav>

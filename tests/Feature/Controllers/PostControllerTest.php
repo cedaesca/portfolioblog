@@ -250,6 +250,16 @@ class PostControllerTest extends TestCase
         $response->assertSessionHasErrors();
     }
 
+    /**
+     * Update tests
+     */
+
+     /** @test */
+     public function a_guest_cannot_edit_a_post()
+     {
+        //
+     }
+
     private function createSinglePublishedPost(): Post
     {
         return Post::factory()->create(['is_published' => true, 'slug' => 'test']);

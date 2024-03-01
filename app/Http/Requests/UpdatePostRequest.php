@@ -6,7 +6,7 @@ use App\Enums\PostType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StorePostRequest extends FormRequest
+class UpdatePostRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,10 +25,15 @@ class StorePostRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:posts,slug',
             'content' => 'required|string',
-            'type' => ['required', 'string', Rule::enum(PostType::class)],
+            'type' => ['required', 'string', Rule::enum (PostType::class)],
             'is_published' => 'sometimes|boolean',
+            'slug' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('posts', 'slug')->ignore($this->route('slug'), 'slug')
+            ]
         ];
     }
 }

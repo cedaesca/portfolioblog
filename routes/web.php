@@ -34,3 +34,7 @@ Route::controller(PostController::class)->group(function () {
         ->where('slug', $slugRegex)
         ->name('posts.show');
 });
+
+Route::get('/test', function () {
+    return view('test');
+});

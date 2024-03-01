@@ -42,4 +42,9 @@ class PostService implements PostServiceInterface
 
         return $post;
     }
+
+    public function updatePost(string $slug, array $attributes): bool
+    {
+        return $this->postModel->whereSlug($slug)->update($attributes);
+    }
 }

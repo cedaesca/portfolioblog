@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Interfaces\Services\PostServiceInterface;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\QueryException;
 
 class PostService implements PostServiceInterface
 {
@@ -44,5 +43,10 @@ class PostService implements PostServiceInterface
         $post->save();
 
         return $post;
+    }
+
+    public function updatePost(string $slug, array $attributes): bool
+    {
+        return $this->postModel->whereSlug($slug)->update($attributes);
     }
 }

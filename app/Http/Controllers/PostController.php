@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\PostType;
 use App\Http\Requests\StorePostRequest;
 use App\Interfaces\Services\PostServiceInterface;
+use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ use Illuminate\Log\Logger;
 
 class PostController extends Controller
 {
-    public function __construct(private PostServiceInterface $postService, private readonly Logger $logger)
+    public function __construct(private PostServiceInterface $postService)
     {
         $this->middleware('auth')->except(['index', 'show']);
     }
@@ -52,9 +53,7 @@ class PostController extends Controller
             $post = $this->postService->storePost($validated);
 
             $postRoute = route('posts.show', $post->slug);
-        } catch (\Exception $e) {
-            $this->logger->error('Error during post creation: ' . $e->getMessage());
-
+        } catch (Exception $e) {
             return back()->withErrors('An error occured while creating the post. Please try again.');
         }
 

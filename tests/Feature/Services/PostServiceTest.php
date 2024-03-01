@@ -15,7 +15,6 @@ class PostServiceTest extends TestCase
     private readonly string $postTable;
 
     use RefreshDatabase;
-    
 
     protected function setUp(): void
     {
@@ -24,7 +23,7 @@ class PostServiceTest extends TestCase
         $this->postService = $this->app->make(PostServiceInterface::class);
         $this->postTable = (new Post())->getTable();
     }
-    
+
     /** @test */
     public function get_all_published_projects_returns_published_projects(): void
     {
@@ -89,7 +88,7 @@ class PostServiceTest extends TestCase
 
         Post::factory()->count(20)->create(['type' => PostType::Article, 'is_published' => true]);
         Post::factory()->count(14)->create(['type' => PostType::Project, 'is_published' => true]);
-        
+
         Post::factory()->count(9)->create(['type' => PostType::Project, 'is_published' => false]);
     }
 }

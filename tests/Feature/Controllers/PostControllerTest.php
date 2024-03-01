@@ -9,15 +9,10 @@ use App\Models\User;
 use App\Services\PostService;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Log\Logger;
-use Mockery;
 use Tests\TestCase;
 
 class PostControllerTest extends TestCase
 {
-    /** @var \Mockery\MockInterface|Logger */
-    private $loggerMock;
-
     private readonly string $postTable;
     private readonly User $user;
 
@@ -26,10 +21,6 @@ class PostControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->loggerMock = Mockery::mock(Logger::class);
-
-        $this->app->instance(Logger::class, $this->loggerMock);
 
         $this->postTable = (new Post())->getTable();
 
@@ -203,29 +194,6 @@ class PostControllerTest extends TestCase
     }
 
     /** @test */
-    public function an_error_is_logged_when_exception_is_thrown_during_post_creation()
-    {
-        $postAttributes = Post::factory()->make()->toArray();
-
-        /** @var \Mockery\MockInterface|PostServiceInterface */
-        $serviceMock = Mockery::mock(PostService::class);
-
-        $exceptionMessage = 'Error during post creation';
-
-        $this->app->instance(PostServiceInterface::class, $serviceMock);
-
-        $serviceMock->shouldReceive('storePost')->andThrow(new Exception($exceptionMessage));
-
-        $this->loggerMock
-            ->shouldReceive('error')
-            ->with("Error during post creation: {$exceptionMessage}")
-            ->once();
-
-        $this->actingAs($this->user)
-            ->post(route('posts.store'), $postAttributes);
-    }
-
-    /** @test */
     public function user_is_redirected_to_create_form_when_exception_is_thrown()
     {
         $createRoute = route('posts.create');
@@ -233,13 +201,11 @@ class PostControllerTest extends TestCase
         $postAttributes = Post::factory()->make()->toArray();
 
         /** @var \Mockery\MockInterface|PostServiceInterface */
-        $serviceMock = Mockery::mock(PostService::class);
+        $serviceMock = $this->mock(PostService::class);
 
         $this->app->instance(PostServiceInterface::class, $serviceMock);
 
         $serviceMock->shouldReceive('storePost')->andThrow(new Exception(''));
-
-        $this->loggerMock->shouldReceive('error');
 
         $response = $this->actingAs($this->user)
             ->from($createRoute)

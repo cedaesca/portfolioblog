@@ -16,5 +16,6 @@ interface PostServiceInterface
     public function getPublishedPostBySlug(string $slug): ?Post;
 
     public function storePost(array $attributes): Post;
-}
 
+    public function updatePost(string $slug, array $attributes): bool;
+}

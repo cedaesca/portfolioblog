@@ -82,6 +82,67 @@ class PostServiceTest extends TestCase
         $this->postService->storePost([]);
     }
 
+    /** @test */
+    public function update_post_throws_exception_if_slug_exists()
+    {
+        $posts = Post::factory()->count(2)->create();
+
+        $this->expectException(QueryException::class);
+
+        $this->postService->updatePost($posts[1]->slug, ['slug' => $posts[0]->slug]);
+    }
+
+    /** @test */
+    public function update_post_returns_false_if_post_is_not_found()
+    {
+        $post = Post::factory()->make()->toArray();
+
+        $isSaved = $this->postService->updatePost('notexistingslug', $post);
+
+        $this->assertFalse($isSaved);
+    }
+
+    /** @test */
+    public function update_post_modifies_single_attribute()
+    {
+        $post = Post::factory()->create();
+
+        $modifiedAttribute = ['title' => 'testing update'];
+
+        $isSaved = $this->postService->updatePost($post->slug, $modifiedAttribute);
+
+        $updatedPost = Post::find($post->id);
+
+        $this->assertTrue($isSaved);
+        $this->assertEquals($modifiedAttribute['title'], $updatedPost->title);
+    }
+
+    /** @test */
+    public function update_post_modifies_all_attributes()
+    {
+        $post = Post::factory()->create()->makeHidden(['created_at', 'updated_at']);
+
+        $modifiedAttributes = Post::factory()->make()->toArray();
+
+        $isSaved = $this->postService->updatePost($post->slug, $modifiedAttributes);
+
+        $this->assertTrue($isSaved);
+
+        $updatedPost = Post::find($post->id);
+
+        foreach ($modifiedAttributes as $key => $value) {
+            $actualValue = $updatedPost->{$key};
+
+            if (!$actualValue instanceof PostType) {
+                $this->assertEquals($value, $actualValue);
+            } else {
+                $expectedEnum = PostType::from($value);
+
+                $this->assertTrue($actualValue === $expectedEnum);
+            }
+        }
+    }
+
     private function seedPosts()
     {
         Post::factory()->count(11)->create(['type' => PostType::Article, 'is_published' => false]);

@@ -8,7 +8,6 @@ use App\Models\Post;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Tests\Traits\AssertsEnums;
 
 class PostServiceTest extends TestCase
 {

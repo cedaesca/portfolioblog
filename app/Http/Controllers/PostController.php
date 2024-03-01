@@ -47,17 +47,14 @@ class PostController extends Controller
     public function store(StorePostRequest $request): RedirectResponse
     {
         $validated = $request->validated();
-        $postRoute = '';
 
         try {
             $post = $this->postService->storePost($validated);
-
-            $postRoute = route('posts.show', $post->slug);
         } catch (Exception $e) {
             return back()->withErrors('An error occured while creating the post. Please try again.');
         }
 
-        return redirect()->to($postRoute);
+        return redirect()->to(route('posts.show', $post->slug));
     }
 
     /**

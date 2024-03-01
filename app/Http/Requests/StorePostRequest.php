@@ -27,7 +27,7 @@ class StorePostRequest extends FormRequest
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:posts,slug',
             'content' => 'required|string',
-            'type' => ['required', 'string', Rule::in(PostType::cases())],
+            'type' => ['required', 'string', Rule::enum(PostType::class)],
             'is_published' => 'sometimes|boolean',
         ];
     }

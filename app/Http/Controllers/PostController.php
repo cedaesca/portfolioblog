@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\PostType;
 use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Interfaces\Services\PostServiceInterface;
 use Exception;
 use Illuminate\Contracts\View\View;
@@ -82,7 +83,7 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update($request, string $slug)
+    public function update(UpdatePostRequest $request, string $slug)
     {
         $validated = $request->validated();
 
@@ -96,7 +97,7 @@ class PostController extends Controller
             return back()->withErrors(['general' => 'An error occured while updating the post. Please try again.']);
         }
 
-        return redirect()->to(route('posts.show', $validated['slug']));
+        return redirect()->to(route('posts.show', $validated['slug'] ?? $slug));
     }
 
     /**

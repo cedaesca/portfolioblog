@@ -218,10 +218,7 @@ class PostControllerTest extends TestCase
 
         $postAttributes = Post::factory()->make()->toArray();
 
-        /** @var \Mockery\MockInterface|PostServiceInterface */
-        $serviceMock = $this->mock(PostService::class);
-
-        $this->app->instance(PostServiceInterface::class, $serviceMock);
+        $serviceMock = $this->mockAndReturnPostService();
 
         $serviceMock->shouldReceive('storePost')->andThrow(new Exception(''));
 
@@ -267,19 +264,26 @@ class PostControllerTest extends TestCase
     {
         $post = $this->createSinglePublishedPost();
 
+        $this->travel(30)->minutes();
+
         $response = $this->put(route('posts.update', $post->slug), ['title' => 'test']);
 
         $freshPost = $post->fresh();
 
         $response->assertRedirect(route('login'));
 
-        $this->assertEquals($post->updated_at, $freshPost->updated_at);
+        $this->assertEquals(
+            $post->updated_at->toDateTimeString(), 
+            $freshPost->updated_at->toDateTimeString()
+        );
     }
 
     /** @test */
     public function an_user_can_update_a_post()
     {
         $post = $this->createSinglePublishedPost();
+
+        $this->travel(30)->minutes();
 
         $modifiyingAttribute = ['title' => 'test'];
 
@@ -288,12 +292,104 @@ class PostControllerTest extends TestCase
 
         $freshPost = $post->fresh();
 
-        $this->assertNotEquals($post->updated_at, $freshPost->updated_at);
-        $this->assertEquals($post->title, $modifiyingAttribute['title']);
+        $this->assertEquals($freshPost->title, $modifiyingAttribute['title']);
+
+        $this->assertNotEquals(
+            $freshPost->updated_at->toDateTimeString(),
+            $post->updated_at->toDateTimeString()
+        );
+    }
+
+    /** @test */
+    public function user_is_redirected_to_successfully_edited_post()
+    {
+        $post = $this->createSinglePublishedPost();
+
+        $modifiyingAttribute = ['title' => 'test'];
+
+        $response = $this->actingAs($this->user)
+            ->put(route('posts.update', $post->slug), $modifiyingAttribute);
+
+        $response->assertRedirectToRoute('posts.show', $post->slug);
+        $response->assertSee($modifiyingAttribute['title']);
+    }
+
+    /** @test */
+    public function user_is_redirected_to_edit_form_when_there_are_validation_errors()
+    {
+        $post = $this->createSinglePublishedPost();
+
+        $editRoute = route('posts.edit', $post->slug);
+
+        $response = $this->actingAs($this->user)
+            ->from($editRoute)
+            ->put(route('posts.update', $post->slug), []);
+
+        $response->assertRedirect($editRoute);
+        $response->assertSessionHasErrors();
+    }
+
+    /** @test */
+    public function user_is_redirected_to_edit_form_when_exception_is_thrown()
+    {
+        $post = $this->createSinglePublishedPost();
+        
+        $editRoute = route('posts.edit', $post->slug);
+
+        $postAttributes = Post::factory()->make()->toArray();
+
+        $serviceMock = $this->mockAndReturnPostService();
+
+        $serviceMock->shouldReceive('updatePost')->andThrow(new Exception(''));
+
+        $response = $this->actingAs($this->user)
+            ->from($editRoute)
+            ->put(route('posts.update', $post->slug), $postAttributes);
+
+        $response->assertRedirect($editRoute);
+
+        $response->assertSessionHasErrors('general');
+    }
+
+    /**
+     * @test
+     * 
+     * This one is basically for when Post::update() returns false
+     * And not for the scenario in which the given updating data is
+     * the same as the current data holded in the post resource
+     */
+    public function user_is_redirected_to_edit_form_when_no_changes_were_made()
+    {
+        $post = $this->createSinglePublishedPost();
+
+        $editRoute = route('posts.edit', $post->slug);
+
+        $postAttributes = Post::factory()->make()->toArray();
+
+        $serviceMock = $this->mockAndReturnPostService();
+
+        $serviceMock->shouldReceive('updatePost')->andReturnFalse();
+
+        $response = $this->actingAs($this->user)
+            ->from($editRoute)
+            ->put(route('posts.update', $post->slug), $postAttributes);
+
+        $response->assertRedirect($editRoute);
+
+        $response->assertSessionHasErrors('general');
     }
 
     private function createSinglePublishedPost(): Post
     {
         return Post::factory()->create(['is_published' => true, 'slug' => 'test']);
+    }
+
+    private function mockAndReturnPostService(): \Mockery\MockInterface|PostServiceInterface
+    {
+        $serviceMock = $this->mock(PostService::class);
+
+        $this->app->instance(PostServiceInterface::class, $serviceMock);
+
+        return $serviceMock;
     }
 }

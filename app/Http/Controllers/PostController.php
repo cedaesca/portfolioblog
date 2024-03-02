@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Enums\PostType;
 use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Interfaces\Services\PostServiceInterface;
 use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
@@ -71,17 +71,33 @@ class PostController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $slug)
     {
-        //
+        $post = $this->postService->getPublishedPostBySlug($slug);
+
+        abort_if(!$post, 404);
+
+        return view('posts.edit')->with('post', $post);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdatePostRequest $request, string $slug)
     {
-        //
+        $validated = $request->validated();
+
+        try {
+            $wasUpdated = $this->postService->updatePost($slug, $validated);
+
+            if (!$wasUpdated) {
+                return back()->withErrors(['general' => 'No changes were made to the post. Please try again.']);
+            }
+        } catch (\Exception $e) {
+            return back()->withErrors(['general' => 'An error occured while updating the post. Please try again.']);
+        }
+
+        return redirect()->to(route('posts.show', $validated['slug'] ?? $slug));
     }
 
     /**

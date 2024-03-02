@@ -71,9 +71,13 @@ class PostController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $slug)
     {
-        //
+        $post = $this->postService->getPublishedPostBySlug($slug);
+
+        abort_if(!$post, 404);
+
+        return view('posts.edit')->with('post', $post);
     }
 
     /**

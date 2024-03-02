@@ -83,9 +83,22 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update($request, string $slug)
     {
-        //
+        $validated = $request->validated();
+
+        try {
+            $wasUpdated = $this->postService->updatePost($slug, $validated);
+
+            if (!$wasUpdated) {
+                return back()->withErrors(['general' => 'No changes were made to the post. Please try again.']);
+            }
+        } catch (\Exception $e) {
+
+            return back()->withErrors(['general' => 'An error occured while updating the post. Please try again.']);
+        }
+
+        return redirect()->to(route('posts.show', $validated['slug']));
     }
 
     /**

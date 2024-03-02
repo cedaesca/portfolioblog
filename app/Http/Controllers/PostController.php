@@ -8,7 +8,6 @@ use App\Interfaces\Services\PostServiceInterface;
 use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
@@ -94,7 +93,6 @@ class PostController extends Controller
                 return back()->withErrors(['general' => 'No changes were made to the post. Please try again.']);
             }
         } catch (\Exception $e) {
-
             return back()->withErrors(['general' => 'An error occured while updating the post. Please try again.']);
         }
 

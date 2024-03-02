@@ -35,7 +35,14 @@ class PostControllerTest extends TestCase
     public function a_guest_can_access_index()
     {
         $response = $this->get(route('index'));
-        $response->assertStatus(200);
+        $response->assertOk();
+    }
+
+    /** @test */
+    public function an_user_can_access_index()
+    {
+        $response = $this->actingAs($this->user)->get(route('index'));
+        $response->assertOk();
     }
 
     /** @test */
@@ -71,7 +78,18 @@ class PostControllerTest extends TestCase
 
         $response = $this->get(route('posts.show', $post->slug));
 
-        $response->assertStatus(200);
+        $response->assertOk();
+        $response->assertSee($post->title);
+    }
+
+    /** @test */
+    public function an_user_can_access_a_single_post()
+    {
+        $post = $this->createSinglePublishedPost();
+
+        $response = $this->actingAs($this->user)->get(route('posts.show', $post->slug));
+
+        $response->assertOk();
         $response->assertSee($post->title);
     }
 
@@ -214,6 +232,64 @@ class PostControllerTest extends TestCase
         $response->assertRedirect($createRoute);
 
         $response->assertSessionHasErrors();
+    }
+
+    /**
+     * Edit tests
+     */
+
+     /** @test */
+     public function a_guest_cannot_access_edit_form()
+    {
+        $post = $this->createSinglePublishedPost();
+
+        $response = $this->get(route('posts.edit', $post->slug));
+        $response->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function edit_renders_correct_view(): void
+    {
+        $post = $this->createSinglePublishedPost();
+
+        $response = $this->actingAs($this->user)
+            ->get(route('posts.edit', $post->slug));
+
+        $response->assertViewIs('posts.edit');
+    }
+
+    /**
+     * Update tests
+     */
+
+     /** @test */
+    public function a_guest_cannot_update_a_post()
+    {
+        $post = $this->createSinglePublishedPost();
+
+        $response = $this->put(route('posts.update', $post->slug), ['title' => 'test']);
+
+        $freshPost = $post->fresh();
+
+        $response->assertRedirect(route('login'));
+
+        $this->assertEquals($post->updated_at, $freshPost->updated_at);
+    }
+
+    /** @test */
+    public function an_user_can_update_a_post()
+    {
+        $post = $this->createSinglePublishedPost();
+
+        $modifiyingAttribute = ['title' => 'test'];
+
+        $this->actingAs($this->user)
+            ->put(route('posts.update', $post->slug), $modifiyingAttribute);
+
+        $freshPost = $post->fresh();
+
+        $this->assertNotEquals($post->updated_at, $freshPost->updated_at);
+        $this->assertEquals($post->title, $modifiyingAttribute['title']);
     }
 
     private function createSinglePublishedPost(): Post

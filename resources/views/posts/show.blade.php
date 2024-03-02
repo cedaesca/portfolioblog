@@ -20,5 +20,8 @@
 
     <nav>
         <a href="{{ route('index') }}">Go Back</a>
+        @auth
+            <a href="{{ route('posts.edit', $post->slug) }}">Edit</a>
+        @endauth
     </nav>
 @endsection
